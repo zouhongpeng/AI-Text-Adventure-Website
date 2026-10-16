@@ -3,25 +3,13 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: '新应用 | 扣子编程',
-    template: '%s | 扣子编程',
+    default: '无尽之书 · AI 文本冒险',
+    template: '%s | 无尽之书',
   },
   description:
-    '扣子编程是一款一站式云端 Vibe Coding 开发平台。通过对话轻松构建智能体、工作流和网站，实现从创意到上线的无缝衔接。',
-  keywords: [
-    '扣子编程',
-    'Coze Code',
-    'Vibe Coding',
-    'AI 编程',
-    '智能体搭建',
-    '工作流搭建',
-    '网站搭建',
-    '网站部署',
-    '全栈开发',
-    'AI 工程师',
-  ],
-  authors: [{ name: 'Coze Code Team', url: 'https://code.coze.cn' }],
-  generator: 'Coze Code',
+    '一款由大语言模型驱动的 AI 文本冒险游戏：用自然语言与世界互动，剧情、位置、物品与人物关系随你的选择无限延伸。',
+  keywords: ['AI 文本冒险', '互动小说', '文字冒险', 'DeepSeek', 'AI 游戏'],
+  authors: [{ name: 'Endless Book' }],
   // icons: {
   //   icon: '',
   // },
@@ -61,8 +49,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`antialiased`}>
+    <html lang="zh-CN">
+      <body className="bg-[#F5F5F7] antialiased">
         {children}
       </body>
     </html>

@@ -7,6 +7,29 @@
 - **Language**: TypeScript 5
 - **UI 组件**: shadcn/ui (基于 Radix UI)
 - **Styling**: Tailwind CSS 4
+- **LLM**: DeepSeek Chat Completions（`deepseek-chat`，OpenAI 兼容协议，SSE 流式）
+
+## AI 文本冒险游戏 —— 模块地图
+
+- `src/app/api/game/route.ts`：唯一后端接口 `POST /api/game`（nodejs runtime，SSE）。读取 `DEEPSEEK_API_KEY`（仅服务端）代理调用 DeepSeek，把上游 token 流转成 `delta/done/error` 三类 SSE 事件。
+- `src/lib/game/types.ts`：核心模型 `GameState / StoryEntry / SaveSlot / ChatMessage / WorldId`。
+- `src/lib/game/worlds.ts`：4 个世界模板（奇幻/科幻/武侠/校园）与 `inferMood`（地点→背景氛围兜底映射）。
+- `src/lib/game/prompts.ts`：system prompt、开局/行动 user prompt、输出协议。模型输出固定为 `正文 → <<<STATE>>> 分隔符 → 单行JSON{narration,options,state}`。
+- `src/lib/game/engine.ts`：`createInitialState`、`parseTurn`（容错解析正文+JSON）、`splitAtNarrativePrefix` 相关的流式安全前缀逻辑（在 route 内联实现 `safeNarrativePrefix`）。
+- `src/lib/game/api.ts`：前端 SSE 客户端 `streamGame`（fetch + ReadableStream reader），零密钥。
+- `src/lib/game/storage.ts`：localStorage 存档（key `ai-text-adventure-saves-v1`，最多 10 条），仅客户端调用。
+- `src/components/game/`：
+  - `GameShell.tsx`：主编排（状态机、回合快照、断线重试 `pending` 快照）。
+  - `StartScreen`（选世界）/ `StoryView`（衬线剧情+流式光标）/ `ActionBar`（输入+卡片式快捷选项）/ `StatusPanel`（位置/背包/NPC/任务）/ `AmbientBackground`（随 mood 变化的环境底色）/ `SaveLoadDialog`。
+
+### 环境变量（仅服务端，.env.local 已 gitignore）
+- `DEEPSEEK_API_KEY`（必填）、`DEEPSEEK_BASE_URL`（默认 https://api.deepseek.com）、`DEEPSEEK_MODEL`（默认 deepseek-chat）。
+- 部署到生产时需要在环境中注入同名变量；前端永不接触密钥。
+
+### 关键约定
+- 修改输出协议需同步改 `prompts.ts` 的 `STATE_DELIMITER`、`route.ts` 的流解析与 `engine.ts` 的 `parseTurn`。
+- 历史只存 `assistant 正文` 与 `user 行动`（不传 system），route 内部重新拼装 system，且仅发送最近 20 条历史。
+- 新增世界：在 `WORLDS` 增加模板，并在 `inferMood`/`AmbientBackground` 需要时补充 mood 映射。
 
 ## 目录结构
 
